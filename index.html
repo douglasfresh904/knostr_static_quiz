@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knostr - Test Your Historical Knowledge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cream: #f4efe4;
+            --ink: #1a1a1a;
+            --red: #c41e3a;
+            --gold: #d4af37;
+            --shadow: rgba(0, 0, 0, 0.15);
+            --border: #8b7355;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Libre Baskerville', serif;
+            background: var(--cream);
+            color: var(--ink);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* Newspaper texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.02) 2px, rgba(0,0,0,.02) 4px);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        /* Header with newspaper masthead style */
+        header {
+            text-align: center;
+            border-top: 4px double var(--ink);
+            border-bottom: 4px double var(--ink);
+            padding: 30px 20px;
+            margin-bottom: 40px;
+            background: linear-gradient(180deg, var(--cream) 0%, #ebe4d5 100%);
+            box-shadow: 0 4px 10px var(--shadow);
+            animation: slideDown 0.8s ease-out;
+            position: relative;
+        }
+
+        .header-reset-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-family: 'Courier Prime', monospace;
+            font-size: 1.5rem;
+            font-weight: 400;
+            padding: 8px 12px;
+            background: transparent;
+            color: var(--border);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+            line-height: 1;
+        }
+
+        .header-reset-btn:hover {
+            color: var(--red);
+            border-color: var(--red);
+            background: rgba(196, 30, 58, 0.05);
+            transform: rotate(180deg);
+        }
+
+        .header-reset-btn:active {
+            transform: rotate(180deg) scale(0.95);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .masthead {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            letter-spacing: -2px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            color: var(--ink);
+            line-height: 1;
+        }
+
+        .tagline {
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--border);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 8px 0;
+            margin-top: 15px;
+        }
+
+        .date-header {
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.75rem;
+            color: var(--border);
+            margin-top: 10px;
+        }
+
+        /* Start screen */
+        /* Start screen with integrated timeline */
+        .start-screen {
+            text-align: center;
+            padding: 60px 30px;
+            background: white;
+            border: 3px solid var(--ink);
+            box-shadow: 8px 8px 0 var(--shadow);
+            animation: fadeIn 0.8s ease-out 0.3s both;
+        }
+
+        .start-screen h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--red);
+        }
+
+        .start-screen p {
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .timeline-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 10px;
+            margin-top: 0;
+            color: var(--red);
+        }
+
+        .timeline-subtitle {
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.85rem;
+            text-align: center;
+            color: var(--border);
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+
+        .slider-container {
+            position: relative;
+            padding: 20px 0;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .timeline-slider {
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #8b7355 0%, var(--gold) 50%, var(--red) 100%);
+            border: 2px solid var(--ink);
+            outline: none;
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .timeline-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 30px;
+            height: 30px;
+            background: var(--red);
+            border: 3px solid var(--ink);
+            cursor: grab;
+            box-shadow: 0 3px 6px var(--shadow);
+            transition: all 0.2s ease;
+        }
+
+        .timeline-slider::-webkit-slider-thumb:hover {
+            background: var(--ink);
+            transform: scale(1.2);
+        }
+
+        .timeline-slider::-webkit-slider-thumb:active {
+            cursor: grabbing;
+            transform: scale(1.1);
+        }
+
+        .timeline-slider::-moz-range-thumb {
+            width: 30px;
+            height: 30px;
+            background: var(--red);
+            border: 3px solid var(--ink);
+            cursor: grab;
+            box-shadow: 0 3px 6px var(--shadow);
+            transition: all 0.2s ease;
+        }
+
+        .timeline-slider::-moz-range-thumb:hover {
+            background: var(--ink);
+            transform: scale(1.2);
+        }
+
+        .timeline-slider::-moz-range-thumb:active {
+            cursor: grabbing;
+            transform: scale(1.1);
+        }
+
+        .timeline-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.75rem;
+            color: var(--border);
+        }
+
+        .timeline-period {
+            text-align: center;
+            margin-top: 25px;
+            padding: 20px;
+            background: var(--cream);
+            border: 2px solid var(--border);
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .period-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--red);
+            margin-bottom: 10px;
+        }
+
+        .period-years {
+            font-family: 'Courier Prime', monospace;
+            font-size: 1.1rem;
+            color: var(--ink);
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .period-description {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--ink);
+        }
+
+        .start-screen button {
+            margin-top: 40px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        button {
+            font-family: 'Courier Prime', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            padding: 18px 45px;
+            background: var(--red);
+            color: var(--cream);
+            border: 3px solid var(--ink);
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 4px 4px 0 var(--ink);
+        }
+
+        button:hover {
+            background: var(--ink);
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 var(--red);
+        }
+
+        button:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 var(--ink);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Quiz area */
+        .quiz-area {
+            display: none;
+        }
+
+        .quiz-area.active {
+            display: block;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--border);
+            margin-bottom: 30px;
+            border: 2px solid var(--ink);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--red);
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .question-card {
+            background: white;
+            border: 3px solid var(--ink);
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 12px 12px 0 var(--shadow);
+            position: relative;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .question-card::before {
+            content: 'BREAKING';
+            position: absolute;
+            top: -15px;
+            left: 30px;
+            background: var(--red);
+            color: var(--cream);
+            padding: 5px 15px;
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            border: 2px solid var(--ink);
+        }
+
+        .question-number {
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.85rem;
+            color: var(--border);
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .question-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 30px;
+            color: var(--ink);
+        }
+
+        .options {
+            display: grid;
+            gap: 15px;
+        }
+
+        .option {
+            padding: 20px 25px;
+            background: var(--cream);
+            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent 0%, rgba(212, 175, 55, 0.1) 50%, transparent 100%);
+            transition: left 0.5s ease;
+        }
+
+        .option:hover::before {
+            left: 100%;
+        }
+
+        .option:hover {
+            background: white;
+            border-color: var(--ink);
+            transform: translateX(5px);
+            box-shadow: 4px 4px 0 var(--shadow);
+        }
+
+        .option.selected {
+            background: var(--gold);
+            border-color: var(--ink);
+            border-width: 3px;
+            font-weight: 700;
+        }
+
+        .option.correct {
+            background: #4a7c59;
+            color: white;
+            border-color: var(--ink);
+            animation: pulse 0.5s ease;
+        }
+
+        .option.incorrect {
+            background: var(--red);
+            color: white;
+            border-color: var(--ink);
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .feedback {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(212, 175, 55, 0.1);
+            border-left: 4px solid var(--gold);
+            font-style: italic;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .reading-links {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border);
+            font-style: normal;
+        }
+
+        .reading-links-title {
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--border);
+            margin-bottom: 10px;
+        }
+
+        .link-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .link-tag {
+            display: inline-block;
+            padding: 6px 12px;
+            background: white;
+            border: 2px solid var(--ink);
+            color: var(--ink);
+            text-decoration: none;
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .link-tag::before {
+            content: '→';
+            position: absolute;
+            right: -20px;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+
+        .link-tag:hover {
+            background: var(--ink);
+            color: var(--cream);
+            padding-right: 24px;
+            transform: translateY(-2px);
+            box-shadow: 2px 2px 0 var(--shadow);
+        }
+
+        .link-tag:hover::before {
+            right: 8px;
+            opacity: 1;
+        }
+
+        .controls {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        /* Results screen */
+        .results-screen {
+            display: none;
+            text-align: center;
+            padding: 50px 30px;
+            background: white;
+            border: 3px solid var(--ink);
+            box-shadow: 12px 12px 0 var(--shadow);
+        }
+
+        .results-screen.active {
+            display: block;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .results-headline {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            color: var(--red);
+            line-height: 1.2;
+        }
+
+        .score-display {
+            font-family: 'Courier Prime', monospace;
+            font-size: 5rem;
+            font-weight: 700;
+            color: var(--ink);
+            margin: 30px 0;
+            text-shadow: 4px 4px 0 var(--shadow);
+        }
+
+        .score-message {
+            font-size: 1.3rem;
+            margin-bottom: 40px;
+            font-style: italic;
+        }
+
+        .review-section {
+            text-align: left;
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 3px double var(--ink);
+        }
+
+        .review-item {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--cream);
+            border-left: 4px solid var(--border);
+        }
+
+        .review-item.correct-answer {
+            border-left-color: #4a7c59;
+        }
+
+        .review-item.wrong-answer {
+            border-left-color: var(--red);
+        }
+
+        .review-question {
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .review-answer {
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .masthead {
+                font-size: 2.5rem;
+            }
+
+            .header-reset-btn {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                font-size: 1.3rem;
+                padding: 6px 10px;
+            }
+
+            .question-text {
+                font-size: 1.4rem;
+            }
+
+            .results-headline {
+                font-size: 2rem;
+            }
+
+            .score-display {
+                font-size: 3rem;
+            }
+
+            button {
+                padding: 15px 30px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="masthead">Knostr</div>
+            <div class="tagline">Test Your Knowledge of World Events</div>
+            <div class="date-header">Est. 2024 • All Eras Edition</div>
+            <button class="header-reset-btn" id="headerResetBtn" title="Reset Quiz">↻</button>
+        </header>
+
+        <div class="start-screen" id="startScreen">
+            <div class="timeline-title">⏳ Select Your Era</div>
+            <div class="timeline-subtitle">Slide through time to explore different historical periods</div>
+            
+            <div class="slider-container">
+                <input type="range" min="0" max="6" value="6" class="timeline-slider" id="timelineSlider">
+                <div class="timeline-labels">
+                    <span>3000 BC</span>
+                    <span>500 BC</span>
+                    <span>500 AD</span>
+                    <span>1500</span>
+                    <span>1800</span>
+                    <span>1900</span>
+                    <span>2000</span>
+                </div>
+            </div>
+
+            <div class="timeline-period" id="periodDisplay">
+                <div class="period-name">Modern Era</div>
+                <div class="period-years">1945 - 2000</div>
+                <div class="period-description">Post-World War II era featuring the Cold War, space exploration, civil rights movements, and rapid technological advancement.</div>
+            </div>
+
+            <button id="startBtn">Begin Your Historical Journey</button>
+        </div>
+
+        <div class="quiz-area" id="quizArea">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+            
+            <div class="question-card" id="questionCard">
+                <div class="question-number" id="questionNumber"></div>
+                <div class="question-text" id="questionText"></div>
+                <div class="options" id="optionsContainer"></div>
+                <div class="feedback" id="feedback" style="display: none;"></div>
+                <div class="controls">
+                    <button id="nextBtn" style="display: none;">Next Question →</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-screen" id="resultsScreen">
+            <div class="results-headline">Final Edition!</div>
+            <div class="score-display" id="scoreDisplay"></div>
+            <div class="score-message" id="scoreMessage"></div>
+            <button id="restartBtn">Take the Quiz Again</button>
+            <div class="review-section" id="reviewSection"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const timePeriods = [
+            {
+                name: "Ancient Civilizations",
+                years: "3000 BC - 500 BC",
+                description: "The birth of writing, agriculture, and the first great empires including Egypt, Mesopotamia, and early China.",
+                value: 0
+            },
+            {
+                name: "Classical Antiquity",
+                years: "500 BC - 500 AD",
+                description: "The age of Greek philosophy, the Roman Empire, and the foundations of Western civilization.",
+                value: 1
+            },
+            {
+                name: "Medieval Period",
+                years: "500 AD - 1500",
+                description: "Feudalism, the rise of Islam, the Crusades, and the foundations of modern Europe and Asia.",
+                value: 2
+            },
+            {
+                name: "Age of Discovery",
+                years: "1500 - 1800",
+                description: "European exploration, colonization, the Renaissance, and the birth of modern science.",
+                value: 3
+            },
+            {
+                name: "Revolutionary Era",
+                years: "1750 - 1900",
+                description: "Industrial Revolution, American and French Revolutions, and the transformation of society.",
+                value: 4
+            },
+            {
+                name: "World Wars Era",
+                years: "1900 - 1945",
+                description: "Two devastating world wars, rapid technological advancement, and dramatic political changes.",
+                value: 5
+            },
+            {
+                name: "Modern Era",
+                years: "1945 - 2000",
+                description: "Post-World War II era featuring the Cold War, space exploration, civil rights movements, and rapid technological advancement.",
+                value: 6
+            }
+        ];
+
+        const quizQuestions = [
+            // Ancient Civilizations (3000 BC - 500 BC)
+            {
+                question: "Which ancient wonder of the world is the only one still standing today?",
+                options: ["Colossus of Rhodes", "Great Pyramid of Giza", "Hanging Gardens of Babylon", "Lighthouse of Alexandria"],
+                correct: 1,
+                explanation: "The Great Pyramid of Giza, built around 2560 BC, is the oldest and only surviving structure of the Seven Wonders of the Ancient World. It was the tallest man-made structure for over 3,800 years.",
+                links: [
+                    { text: "Colossus of Rhodes", url: "https://en.wikipedia.org/wiki/Colossus_of_Rhodes" },
+                    { text: "Great Pyramid of Giza", url: "https://en.wikipedia.org/wiki/Great_Pyramid_of_Giza" },
+                    { text: "Hanging Gardens of Babylon", url: "https://en.wikipedia.org/wiki/Hanging_Gardens_of_Babylon" },
+                    { text: "Lighthouse of Alexandria", url: "https://en.wikipedia.org/wiki/Lighthouse_of_Alexandria" },
+                    { text: "Seven Wonders", url: "https://en.wikipedia.org/wiki/Seven_Wonders_of_the_Ancient_World" },
+                    { text: "Ancient Egypt", url: "https://en.wikipedia.org/wiki/Ancient_Egypt" }
+                ],
+                period: 0
+            },
+            {
+                question: "Which ancient civilization is credited with inventing the wheel?",
+                options: ["Ancient Egypt", "Ancient Greece", "Mesopotamia", "Indus Valley"],
+                correct: 2,
+                explanation: "The Mesopotamians invented the wheel around 3500 BC. It revolutionized transportation and pottery making, becoming one of humanity's most important innovations.",
+                links: [
+                    { text: "Ancient Egypt", url: "https://en.wikipedia.org/wiki/Ancient_Egypt" },
+                    { text: "Ancient Greece", url: "https://en.wikipedia.org/wiki/Ancient_Greece" },
+                    { text: "Mesopotamia", url: "https://en.wikipedia.org/wiki/Mesopotamia" },
+                    { text: "Indus Valley", url: "https://en.wikipedia.org/wiki/Indus_Valley_Civilisation" },
+                    { text: "History of the Wheel", url: "https://en.wikipedia.org/wiki/Wheel" },
+                    { text: "Sumerian Civilization", url: "https://en.wikipedia.org/wiki/Sumer" }
+                ],
+                period: 0
+            },
+            {
+                question: "What writing system did ancient Egyptians use?",
+                options: ["Cuneiform", "Hieroglyphics", "Sanskrit", "Linear A"],
+                correct: 1,
+                explanation: "Ancient Egyptians used hieroglyphics, a formal writing system combining logographic and alphabetic elements. It was used from around 3200 BC until the 4th century AD.",
+                links: [
+                    { text: "Cuneiform", url: "https://en.wikipedia.org/wiki/Cuneiform" },
+                    { text: "Egyptian Hieroglyphs", url: "https://en.wikipedia.org/wiki/Egyptian_hieroglyphs" },
+                    { text: "Sanskrit", url: "https://en.wikipedia.org/wiki/Sanskrit" },
+                    { text: "Linear A", url: "https://en.wikipedia.org/wiki/Linear_A" },
+                    { text: "Rosetta Stone", url: "https://en.wikipedia.org/wiki/Rosetta_Stone" },
+                    { text: "Ancient Egyptian Language", url: "https://en.wikipedia.org/wiki/Egyptian_language" }
+                ],
+                period: 0
+            },
+            {
+                question: "Who was the famous pharaoh known for building the largest pyramid in Egypt?",
+                options: ["Tutankhamun", "Khufu", "Ramesses II", "Cleopatra"],
+                correct: 1,
+                explanation: "Khufu (also known as Cheops) built the Great Pyramid of Giza around 2580 BC. It remained the tallest man-made structure for over 3,800 years.",
+                links: [
+                    { text: "Tutankhamun", url: "https://en.wikipedia.org/wiki/Tutankhamun" },
+                    { text: "Khufu", url: "https://en.wikipedia.org/wiki/Khufu" },
+                    { text: "Ramesses II", url: "https://en.wikipedia.org/wiki/Ramesses_II" },
+                    { text: "Cleopatra", url: "https://en.wikipedia.org/wiki/Cleopatra" },
+                    { text: "Egyptian Pharaohs", url: "https://en.wikipedia.org/wiki/Pharaoh" }
+                ],
+                period: 0
+            },
+            {
+                question: "Which ancient code is one of the earliest written legal codes?",
+                options: ["Code of Hammurabi", "Twelve Tables", "Justinian Code", "Magna Carta"],
+                correct: 0,
+                explanation: "The Code of Hammurabi, created around 1754 BC in ancient Babylon, is one of the oldest and most complete written legal codes. It established the principle of 'an eye for an eye.'",
+                links: [
+                    { text: "Code of Hammurabi", url: "https://en.wikipedia.org/wiki/Code_of_Hammurabi" },
+                    { text: "Twelve Tables", url: "https://en.wikipedia.org/wiki/Twelve_Tables" },
+                    { text: "Justinian Code", url: "https://en.wikipedia.org/wiki/Corpus_Juris_Civilis" },
+                    { text: "Magna Carta", url: "https://en.wikipedia.org/wiki/Magna_Carta" },
+                    { text: "Hammurabi", url: "https://en.wikipedia.org/wiki/Hammurabi" }
+                ],
+                period: 0
+            },
+            {
+                question: "What ancient city is considered the birthplace of democracy?",
+                options: ["Rome", "Athens", "Sparta", "Babylon"],
+                correct: 1,
+                explanation: "Athens is considered the birthplace of democracy, developing the first known democratic system around 508 BC under Cleisthenes' reforms.",
+                links: [
+                    { text: "Rome", url: "https://en.wikipedia.org/wiki/Ancient_Rome" },
+                    { text: "Athens", url: "https://en.wikipedia.org/wiki/Athens" },
+                    { text: "Sparta", url: "https://en.wikipedia.org/wiki/Sparta" },
+                    { text: "Babylon", url: "https://en.wikipedia.org/wiki/Babylon" },
+                    { text: "Athenian Democracy", url: "https://en.wikipedia.org/wiki/Athenian_democracy" },
+                    { text: "Cleisthenes", url: "https://en.wikipedia.org/wiki/Cleisthenes" }
+                ],
+                period: 0
+            },
+
+            // Classical Antiquity (500 BC - 500 AD)
+            {
+                question: "Who was the famous Greek philosopher who taught Alexander the Great?",
+                options: ["Socrates", "Plato", "Aristotle", "Pythagoras"],
+                correct: 2,
+                explanation: "Aristotle tutored Alexander the Great starting in 343 BC. This relationship between one of history's greatest minds and greatest conquerors significantly influenced Western civilization.",
+                links: [
+                    { text: "Socrates", url: "https://en.wikipedia.org/wiki/Socrates" },
+                    { text: "Plato", url: "https://en.wikipedia.org/wiki/Plato" },
+                    { text: "Aristotle", url: "https://en.wikipedia.org/wiki/Aristotle" },
+                    { text: "Pythagoras", url: "https://en.wikipedia.org/wiki/Pythagoras" },
+                    { text: "Alexander the Great", url: "https://en.wikipedia.org/wiki/Alexander_the_Great" },
+                    { text: "Ancient Greek Philosophy", url: "https://en.wikipedia.org/wiki/Ancient_Greek_philosophy" }
+                ],
+                period: 1
+            },
+            {
+                question: "In what year did Julius Caesar cross the Rubicon, starting a civil war?",
+                options: ["49 BC", "44 BC", "59 BC", "33 BC"],
+                correct: 0,
+                explanation: "Julius Caesar crossed the Rubicon River in 49 BC with his army, defying the Roman Senate. This act of rebellion led to civil war and eventually to Caesar becoming dictator.",
+                links: [
+                    { text: "Julius Caesar", url: "https://en.wikipedia.org/wiki/Julius_Caesar" },
+                    { text: "Crossing the Rubicon", url: "https://en.wikipedia.org/wiki/Crossing_the_Rubicon" },
+                    { text: "Roman Civil War", url: "https://en.wikipedia.org/wiki/Caesar%27s_Civil_War" },
+                    { text: "Roman Republic", url: "https://en.wikipedia.org/wiki/Roman_Republic" }
+                ],
+                period: 1
+            },
+            {
+                question: "Which Roman emperor was ruling when Jesus Christ was born?",
+                options: ["Julius Caesar", "Augustus", "Nero", "Constantine"],
+                correct: 1,
+                explanation: "Augustus (formerly Octavian) was the Roman emperor when Jesus was born around 4 BC. He was the first Roman emperor and ruled from 27 BC to 14 AD.",
+                links: [
+                    { text: "Julius Caesar", url: "https://en.wikipedia.org/wiki/Julius_Caesar" },
+                    { text: "Augustus", url: "https://en.wikipedia.org/wiki/Augustus" },
+                    { text: "Nero", url: "https://en.wikipedia.org/wiki/Nero" },
+                    { text: "Constantine", url: "https://en.wikipedia.org/wiki/Constantine_the_Great" },
+                    { text: "Roman Empire", url: "https://en.wikipedia.org/wiki/Roman_Empire" },
+                    { text: "Pax Romana", url: "https://en.wikipedia.org/wiki/Pax_Romana" }
+                ],
+                period: 1
+            },
+            {
+                question: "What famous battle did the Greeks win against the Persians in 490 BC?",
+                options: ["Battle of Thermopylae", "Battle of Marathon", "Battle of Salamis", "Battle of Plataea"],
+                correct: 1,
+                explanation: "The Battle of Marathon in 490 BC saw the Athenians defeat the Persian invasion force. Legend says a messenger ran 26 miles to Athens to announce the victory, inspiring the modern marathon race.",
+                links: [
+                    { text: "Battle of Thermopylae", url: "https://en.wikipedia.org/wiki/Battle_of_Thermopylae" },
+                    { text: "Battle of Marathon", url: "https://en.wikipedia.org/wiki/Battle_of_Marathon" },
+                    { text: "Battle of Salamis", url: "https://en.wikipedia.org/wiki/Battle_of_Salamis" },
+                    { text: "Battle of Plataea", url: "https://en.wikipedia.org/wiki/Battle_of_Plataea" },
+                    { text: "Greco-Persian Wars", url: "https://en.wikipedia.org/wiki/Greco-Persian_Wars" }
+                ],
+                period: 1
+            },
+            {
+                question: "Who was the famous Carthaginian general who crossed the Alps with elephants?",
+                options: ["Scipio Africanus", "Hannibal", "Hamilcar", "Hasdrubal"],
+                correct: 1,
+                explanation: "Hannibal Barca crossed the Alps with his army and war elephants in 218 BC during the Second Punic War, achieving one of the most celebrated military feats in history.",
+                links: [
+                    { text: "Scipio Africanus", url: "https://en.wikipedia.org/wiki/Scipio_Africanus" },
+                    { text: "Hannibal", url: "https://en.wikipedia.org/wiki/Hannibal" },
+                    { text: "Hamilcar Barca", url: "https://en.wikipedia.org/wiki/Hamilcar_Barca" },
+                    { text: "Hasdrubal", url: "https://en.wikipedia.org/wiki/Hasdrubal_Barca" },
+                    { text: "Punic Wars", url: "https://en.wikipedia.org/wiki/Punic_Wars" },
+                    { text: "Carthage", url: "https://en.wikipedia.org/wiki/Carthage" }
+                ],
+                period: 1
+            },
+            {
+                question: "What year was Rome officially founded according to legend?",
+                options: ["753 BC", "509 BC", "27 BC", "476 AD"],
+                correct: 0,
+                explanation: "According to Roman mythology, Rome was founded in 753 BC by Romulus, who became its first king after killing his twin brother Remus.",
+                links: [
+                    { text: "Founding of Rome", url: "https://en.wikipedia.org/wiki/Founding_of_Rome" },
+                    { text: "Romulus and Remus", url: "https://en.wikipedia.org/wiki/Romulus_and_Remus" },
+                    { text: "Ancient Rome", url: "https://en.wikipedia.org/wiki/Ancient_Rome" },
+                    { text: "Roman Kingdom", url: "https://en.wikipedia.org/wiki/Roman_Kingdom" }
+                ],
+                period: 1
+            },
+            {
+                question: "Who was the last pharaoh of ancient Egypt?",
+                options: ["Tutankhamun", "Ramesses II", "Cleopatra VII", "Nefertiti"],
+                correct: 2,
+                explanation: "Cleopatra VII was the last active pharaoh of ancient Egypt, ruling from 51 BC until her death in 30 BC. Her death marked the end of the Ptolemaic Kingdom and Egypt's annexation by Rome.",
+                links: [
+                    { text: "Tutankhamun", url: "https://en.wikipedia.org/wiki/Tutankhamun" },
+                    { text: "Ramesses II", url: "https://en.wikipedia.org/wiki/Ramesses_II" },
+                    { text: "Cleopatra VII", url: "https://en.wikipedia.org/wiki/Cleopatra" },
+                    { text: "Nefertiti", url: "https://en.wikipedia.org/wiki/Nefertiti" },
+                    { text: "Ptolemaic Kingdom", url: "https://en.wikipedia.org/wiki/Ptolemaic_Kingdom" }
+                ],
+                period: 1
+            },
+
+            // Medieval Period (500 AD - 1500)
+            {
+                question: "Who led the Mongol Empire during its greatest expansion?",
+                options: ["Kublai Khan", "Genghis Khan", "Attila the Hun", "Tamerlane"],
+                correct: 1,
+                explanation: "Genghis Khan founded and led the Mongol Empire from 1206 until his death in 1227. His empire became the largest contiguous land empire in history.",
+                links: [
+                    { text: "Kublai Khan", url: "https://en.wikipedia.org/wiki/Kublai_Khan" },
+                    { text: "Genghis Khan", url: "https://en.wikipedia.org/wiki/Genghis_Khan" },
+                    { text: "Attila the Hun", url: "https://en.wikipedia.org/wiki/Attila" },
+                    { text: "Tamerlane", url: "https://en.wikipedia.org/wiki/Timur" },
+                    { text: "Mongol Empire", url: "https://en.wikipedia.org/wiki/Mongol_Empire" },
+                    { text: "Mongol Conquests", url: "https://en.wikipedia.org/wiki/Mongol_conquest" }
+                ],
+                period: 2
+            },
+            {
+                question: "What pandemic devastated Europe in the 14th century?",
+                options: ["Smallpox", "Spanish Flu", "Black Death", "Cholera"],
+                correct: 2,
+                explanation: "The Black Death (bubonic plague) killed an estimated 75-200 million people in Eurasia between 1347 and 1353, wiping out up to 60% of Europe's population.",
+                links: [
+                    { text: "Smallpox", url: "https://en.wikipedia.org/wiki/Smallpox" },
+                    { text: "Spanish Flu", url: "https://en.wikipedia.org/wiki/Spanish_flu" },
+                    { text: "Black Death", url: "https://en.wikipedia.org/wiki/Black_Death" },
+                    { text: "Cholera", url: "https://en.wikipedia.org/wiki/Cholera" },
+                    { text: "Bubonic Plague", url: "https://en.wikipedia.org/wiki/Bubonic_plague" },
+                    { text: "Medieval Europe", url: "https://en.wikipedia.org/wiki/Middle_Ages" }
+                ],
+                period: 2
+            },
+            {
+                question: "In what year did the Battle of Hastings take place?",
+                options: ["1066", "1166", "1266", "966"],
+                correct: 0,
+                explanation: "The Battle of Hastings occurred on October 14, 1066, when William the Conqueror defeated King Harold II. This Norman conquest fundamentally changed English history.",
+                links: [
+                    { text: "Battle of Hastings", url: "https://en.wikipedia.org/wiki/Battle_of_Hastings" },
+                    { text: "William the Conqueror", url: "https://en.wikipedia.org/wiki/William_the_Conqueror" },
+                    { text: "Norman Conquest", url: "https://en.wikipedia.org/wiki/Norman_Conquest" },
+                    { text: "Harold II", url: "https://en.wikipedia.org/wiki/Harold_Godwinson" }
+                ],
+                period: 2
+            },
+            {
+                question: "Which religious military campaigns were fought between Christians and Muslims?",
+                options: ["Hundred Years War", "The Crusades", "Reconquista", "Thirty Years War"],
+                correct: 1,
+                explanation: "The Crusades were a series of religious wars from 1095 to 1291, primarily aimed at recovering the Holy Land from Muslim rule. They had lasting impacts on Christian-Muslim relations.",
+                links: [
+                    { text: "Hundred Years War", url: "https://en.wikipedia.org/wiki/Hundred_Years%27_War" },
+                    { text: "The Crusades", url: "https://en.wikipedia.org/wiki/Crusades" },
+                    { text: "Reconquista", url: "https://en.wikipedia.org/wiki/Reconquista" },
+                    { text: "Thirty Years War", url: "https://en.wikipedia.org/wiki/Thirty_Years%27_War" },
+                    { text: "First Crusade", url: "https://en.wikipedia.org/wiki/First_Crusade" }
+                ],
+                period: 2
+            },
+            {
+                question: "Who was the French heroine who led troops during the Hundred Years' War?",
+                options: ["Eleanor of Aquitaine", "Joan of Arc", "Marie Antoinette", "Catherine de' Medici"],
+                correct: 1,
+                explanation: "Joan of Arc led French forces to several important victories during the Hundred Years' War before being captured and executed in 1431 at age 19. She was later canonized as a saint.",
+                links: [
+                    { text: "Eleanor of Aquitaine", url: "https://en.wikipedia.org/wiki/Eleanor_of_Aquitaine" },
+                    { text: "Joan of Arc", url: "https://en.wikipedia.org/wiki/Joan_of_Arc" },
+                    { text: "Marie Antoinette", url: "https://en.wikipedia.org/wiki/Marie_Antoinette" },
+                    { text: "Catherine de' Medici", url: "https://en.wikipedia.org/wiki/Catherine_de%27_Medici" },
+                    { text: "Hundred Years' War", url: "https://en.wikipedia.org/wiki/Hundred_Years%27_War" }
+                ],
+                period: 2
+            },
+            {
+                question: "What document did King John of England sign in 1215, limiting royal power?",
+                options: ["Declaration of Independence", "Magna Carta", "Bill of Rights", "Charter of Liberties"],
+                correct: 1,
+                explanation: "The Magna Carta, signed in 1215, was a revolutionary document that limited the king's power and established that everyone, including the monarch, was subject to the law.",
+                links: [
+                    { text: "Declaration of Independence", url: "https://en.wikipedia.org/wiki/United_States_Declaration_of_Independence" },
+                    { text: "Magna Carta", url: "https://en.wikipedia.org/wiki/Magna_Carta" },
+                    { text: "Bill of Rights", url: "https://en.wikipedia.org/wiki/Bill_of_Rights_1689" },
+                    { text: "Charter of Liberties", url: "https://en.wikipedia.org/wiki/Charter_of_Liberties" },
+                    { text: "King John", url: "https://en.wikipedia.org/wiki/John,_King_of_England" }
+                ],
+                period: 2
+            },
+            {
+                question: "What was the capital of the Byzantine Empire?",
+                options: ["Rome", "Athens", "Constantinople", "Alexandria"],
+                correct: 2,
+                explanation: "Constantinople (modern-day Istanbul) was the capital of the Byzantine Empire for over 1,000 years until it fell to the Ottoman Turks in 1453.",
+                links: [
+                    { text: "Rome", url: "https://en.wikipedia.org/wiki/Rome" },
+                    { text: "Athens", url: "https://en.wikipedia.org/wiki/Athens" },
+                    { text: "Constantinople", url: "https://en.wikipedia.org/wiki/Constantinople" },
+                    { text: "Alexandria", url: "https://en.wikipedia.org/wiki/Alexandria" },
+                    { text: "Byzantine Empire", url: "https://en.wikipedia.org/wiki/Byzantine_Empire" },
+                    { text: "Fall of Constantinople", url: "https://en.wikipedia.org/wiki/Fall_of_Constantinople" }
+                ],
+                period: 2
+            },
+
+            // Age of Discovery (1500 - 1800)
+            {
+                question: "In what year did Christopher Columbus first reach the Americas?",
+                options: ["1492", "1488", "1500", "1476"],
+                correct: 0,
+                explanation: "Christopher Columbus reached the Americas on October 12, 1492, landing in what is now the Bahamas. This voyage marked the beginning of widespread European exploration and colonization of the Americas.",
+                links: [
+                    { text: "Christopher Columbus", url: "https://en.wikipedia.org/wiki/Christopher_Columbus" },
+                    { text: "Age of Discovery", url: "https://en.wikipedia.org/wiki/Age_of_Discovery" },
+                    { text: "Columbian Exchange", url: "https://en.wikipedia.org/wiki/Columbian_exchange" },
+                    { text: "The Americas", url: "https://en.wikipedia.org/wiki/Americas" }
+                ],
+                period: 3
+            },
+            {
+                question: "What was the name of the ship that brought the Pilgrims to America in 1620?",
+                options: ["Santa Maria", "Mayflower", "HMS Victory", "Nina"],
+                correct: 1,
+                explanation: "The Mayflower carried 102 passengers, known as Pilgrims, from Plymouth, England to the New World in 1620. They established Plymouth Colony in what is now Massachusetts.",
+                links: [
+                    { text: "Santa Maria", url: "https://en.wikipedia.org/wiki/Santa_Mar%C3%ADa_(ship)" },
+                    { text: "Mayflower", url: "https://en.wikipedia.org/wiki/Mayflower" },
+                    { text: "HMS Victory", url: "https://en.wikipedia.org/wiki/HMS_Victory" },
+                    { text: "Niña", url: "https://en.wikipedia.org/wiki/Ni%C3%B1a" },
+                    { text: "Pilgrims", url: "https://en.wikipedia.org/wiki/Pilgrims_(Plymouth_Colony)" },
+                    { text: "Plymouth Colony", url: "https://en.wikipedia.org/wiki/Plymouth_Colony" }
+                ],
+                period: 3
+            },
+            {
+                question: "Which empire built Machu Picchu?",
+                options: ["Aztec Empire", "Maya Empire", "Inca Empire", "Olmec Empire"],
+                correct: 2,
+                explanation: "The Inca Empire built Machu Picchu around 1450 AD in Peru. This iconic citadel sits at 7,970 feet above sea level and is one of the most significant archaeological sites in the world.",
+                links: [
+                    { text: "Aztec Empire", url: "https://en.wikipedia.org/wiki/Aztec_Empire" },
+                    { text: "Maya Civilization", url: "https://en.wikipedia.org/wiki/Maya_civilization" },
+                    { text: "Inca Empire", url: "https://en.wikipedia.org/wiki/Inca_Empire" },
+                    { text: "Olmec", url: "https://en.wikipedia.org/wiki/Olmecs" },
+                    { text: "Machu Picchu", url: "https://en.wikipedia.org/wiki/Machu_Picchu" },
+                    { text: "Pre-Columbian Peru", url: "https://en.wikipedia.org/wiki/History_of_Peru" }
+                ],
+                period: 3
+            },
+            {
+                question: "Who was the Portuguese explorer who first sailed around the Cape of Good Hope?",
+                options: ["Vasco da Gama", "Ferdinand Magellan", "Bartolomeu Dias", "Prince Henry"],
+                correct: 2,
+                explanation: "Bartolomeu Dias first rounded the Cape of Good Hope in 1488, opening the sea route from Europe to Asia and revolutionizing global trade.",
+                links: [
+                    { text: "Vasco da Gama", url: "https://en.wikipedia.org/wiki/Vasco_da_Gama" },
+                    { text: "Ferdinand Magellan", url: "https://en.wikipedia.org/wiki/Ferdinand_Magellan" },
+                    { text: "Bartolomeu Dias", url: "https://en.wikipedia.org/wiki/Bartolomeu_Dias" },
+                    { text: "Prince Henry", url: "https://en.wikipedia.org/wiki/Prince_Henry_the_Navigator" },
+                    { text: "Cape of Good Hope", url: "https://en.wikipedia.org/wiki/Cape_of_Good_Hope" },
+                    { text: "Portuguese Discoveries", url: "https://en.wikipedia.org/wiki/Portuguese_discoveries" }
+                ],
+                period: 3
+            },
+            {
+                question: "Which Spanish conquistador conquered the Aztec Empire?",
+                options: ["Francisco Pizarro", "Hernán Cortés", "Vasco Núñez de Balboa", "Pedro de Alvarado"],
+                correct: 1,
+                explanation: "Hernán Cortés conquered the Aztec Empire between 1519-1521, defeating Emperor Moctezuma II and ending one of the most powerful civilizations in the Americas.",
+                links: [
+                    { text: "Francisco Pizarro", url: "https://en.wikipedia.org/wiki/Francisco_Pizarro" },
+                    { text: "Hernán Cortés", url: "https://en.wikipedia.org/wiki/Hern%C3%A1n_Cort%C3%A9s" },
+                    { text: "Vasco Núñez de Balboa", url: "https://en.wikipedia.org/wiki/Vasco_N%C3%BA%C3%B1ez_de_Balboa" },
+                    { text: "Pedro de Alvarado", url: "https://en.wikipedia.org/wiki/Pedro_de_Alvarado" },
+                    { text: "Spanish Conquest of Aztec", url: "https://en.wikipedia.org/wiki/Spanish_conquest_of_the_Aztec_Empire" },
+                    { text: "Moctezuma II", url: "https://en.wikipedia.org/wiki/Moctezuma_II" }
+                ],
+                period: 3
+            },
+            {
+                question: "What artistic and cultural movement began in 14th-century Italy?",
+                options: ["Baroque", "Renaissance", "Romanticism", "Enlightenment"],
+                correct: 1,
+                explanation: "The Renaissance began in 14th-century Italy and spread throughout Europe, marking a cultural rebirth featuring achievements in art, architecture, politics, science, and literature.",
+                links: [
+                    { text: "Baroque", url: "https://en.wikipedia.org/wiki/Baroque" },
+                    { text: "Renaissance", url: "https://en.wikipedia.org/wiki/Renaissance" },
+                    { text: "Romanticism", url: "https://en.wikipedia.org/wiki/Romanticism" },
+                    { text: "Enlightenment", url: "https://en.wikipedia.org/wiki/Age_of_Enlightenment" },
+                    { text: "Italian Renaissance", url: "https://en.wikipedia.org/wiki/Italian_Renaissance" }
+                ],
+                period: 3
+            },
+            {
+                question: "Who painted the ceiling of the Sistine Chapel?",
+                options: ["Leonardo da Vinci", "Raphael", "Michelangelo", "Donatello"],
+                correct: 2,
+                explanation: "Michelangelo painted the ceiling of the Sistine Chapel between 1508 and 1512, creating one of the most famous artworks in Western art history.",
+                links: [
+                    { text: "Leonardo da Vinci", url: "https://en.wikipedia.org/wiki/Leonardo_da_Vinci" },
+                    { text: "Raphael", url: "https://en.wikipedia.org/wiki/Raphael" },
+                    { text: "Michelangelo", url: "https://en.wikipedia.org/wiki/Michelangelo" },
+                    { text: "Donatello", url: "https://en.wikipedia.org/wiki/Donatello" },
+                    { text: "Sistine Chapel", url: "https://en.wikipedia.org/wiki/Sistine_Chapel_ceiling" }
+                ],
+                period: 3
+            },
+
+            // Revolutionary Era (1750 - 1900)
+            {
+                question: "In what year did the United States declare independence?",
+                options: ["1774", "1775", "1776", "1777"],
+                correct: 2,
+                explanation: "The United States declared independence from Great Britain on July 4, 1776. The Declaration of Independence, primarily written by Thomas Jefferson, proclaimed the thirteen colonies as independent sovereign states.",
+                links: [
+                    { text: "Declaration of Independence", url: "https://en.wikipedia.org/wiki/United_States_Declaration_of_Independence" },
+                    { text: "American Revolution", url: "https://en.wikipedia.org/wiki/American_Revolution" },
+                    { text: "Thomas Jefferson", url: "https://en.wikipedia.org/wiki/Thomas_Jefferson" },
+                    { text: "13 Colonies", url: "https://en.wikipedia.org/wiki/Thirteen_Colonies" }
+                ],
+                period: 4
+            },
+            {
+                question: "When did the French Revolution begin?",
+                options: ["1789", "1799", "1779", "1769"],
+                correct: 0,
+                explanation: "The French Revolution began in 1789 with the storming of the Bastille on July 14. This period of radical social and political upheaval in France lasted until 1799 and profoundly changed the course of modern history.",
+                links: [
+                    { text: "French Revolution", url: "https://en.wikipedia.org/wiki/French_Revolution" },
+                    { text: "Storming of Bastille", url: "https://en.wikipedia.org/wiki/Storming_of_the_Bastille" },
+                    { text: "Reign of Terror", url: "https://en.wikipedia.org/wiki/Reign_of_Terror" },
+                    { text: "Napoleon Bonaparte", url: "https://en.wikipedia.org/wiki/Napoleon" }
+                ],
+                period: 4
+            },
+            {
+                question: "Who was the first President of the United States?",
+                options: ["John Adams", "Thomas Jefferson", "Benjamin Franklin", "George Washington"],
+                correct: 3,
+                explanation: "George Washington served as the first President of the United States from 1789 to 1797. He is often called the 'Father of His Country' and set many precedents for the office.",
+                links: [
+                    { text: "John Adams", url: "https://en.wikipedia.org/wiki/John_Adams" },
+                    { text: "Thomas Jefferson", url: "https://en.wikipedia.org/wiki/Thomas_Jefferson" },
+                    { text: "Benjamin Franklin", url: "https://en.wikipedia.org/wiki/Benjamin_Franklin" },
+                    { text: "George Washington", url: "https://en.wikipedia.org/wiki/George_Washington" },
+                    { text: "US Presidency", url: "https://en.wikipedia.org/wiki/President_of_the_United_States" },
+                    { text: "Founding Fathers", url: "https://en.wikipedia.org/wiki/Founding_Fathers_of_the_United_States" }
+                ],
+                period: 4
+            },
+            {
+                question: "Which battle is considered the turning point of the American Civil War?",
+                options: ["Battle of Antietam", "Battle of Gettysburg", "Battle of Bull Run", "Battle of Shiloh"],
+                correct: 1,
+                explanation: "The Battle of Gettysburg (July 1-3, 1863) is considered the turning point of the Civil War. It resulted in a Union victory and ended General Robert E. Lee's invasion of the North.",
+                links: [
+                    { text: "Battle of Antietam", url: "https://en.wikipedia.org/wiki/Battle_of_Antietam" },
+                    { text: "Battle of Gettysburg", url: "https://en.wikipedia.org/wiki/Battle_of_Gettysburg" },
+                    { text: "First Battle of Bull Run", url: "https://en.wikipedia.org/wiki/First_Battle_of_Bull_Run" },
+                    { text: "Battle of Shiloh", url: "https://en.wikipedia.org/wiki/Battle_of_Shiloh" },
+                    { text: "American Civil War", url: "https://en.wikipedia.org/wiki/American_Civil_War" },
+                    { text: "Robert E. Lee", url: "https://en.wikipedia.org/wiki/Robert_E._Lee" },
+                    { text: "Gettysburg Address", url: "https://en.wikipedia.org/wiki/Gettysburg_Address" }
+                ],
+                period: 4
+            },
+            {
+                question: "Who led the Latin American independence movements in the early 19th century?",
+                options: ["Simón Bolívar", "Che Guevara", "Fidel Castro", "José Martí"],
+                correct: 0,
+                explanation: "Simón Bolívar led independence movements across South America, liberating six nations from Spanish rule. He's known as 'El Libertador' (The Liberator).",
+                links: [
+                    { text: "Simón Bolívar", url: "https://en.wikipedia.org/wiki/Sim%C3%B3n_Bol%C3%ADvar" },
+                    { text: "Che Guevara", url: "https://en.wikipedia.org/wiki/Che_Guevara" },
+                    { text: "Fidel Castro", url: "https://en.wikipedia.org/wiki/Fidel_Castro" },
+                    { text: "José Martí", url: "https://en.wikipedia.org/wiki/Jos%C3%A9_Mart%C3%AD" },
+                    { text: "Latin American Wars", url: "https://en.wikipedia.org/wiki/Spanish_American_wars_of_independence" }
+                ],
+                period: 4
+            },
+            {
+                question: "What invention revolutionized textile manufacturing during the Industrial Revolution?",
+                options: ["Steam engine", "Spinning jenny", "Telegraph", "Locomotive"],
+                correct: 1,
+                explanation: "The spinning jenny, invented by James Hargreaves in 1764, revolutionized textile manufacturing by allowing one worker to spin multiple threads simultaneously.",
+                links: [
+                    { text: "Steam Engine", url: "https://en.wikipedia.org/wiki/Steam_engine" },
+                    { text: "Spinning Jenny", url: "https://en.wikipedia.org/wiki/Spinning_jenny" },
+                    { text: "Telegraph", url: "https://en.wikipedia.org/wiki/Electrical_telegraph" },
+                    { text: "Locomotive", url: "https://en.wikipedia.org/wiki/Locomotive" },
+                    { text: "Industrial Revolution", url: "https://en.wikipedia.org/wiki/Industrial_Revolution" }
+                ],
+                period: 4
+            },
+            {
+                question: "Who wrote 'The Communist Manifesto' with Friedrich Engels?",
+                options: ["Vladimir Lenin", "Karl Marx", "Leon Trotsky", "Joseph Stalin"],
+                correct: 1,
+                explanation: "Karl Marx and Friedrich Engels published 'The Communist Manifesto' in 1848, outlining their theory of communism and class struggle that would influence world politics for over a century.",
+                links: [
+                    { text: "Vladimir Lenin", url: "https://en.wikipedia.org/wiki/Vladimir_Lenin" },
+                    { text: "Karl Marx", url: "https://en.wikipedia.org/wiki/Karl_Marx" },
+                    { text: "Leon Trotsky", url: "https://en.wikipedia.org/wiki/Leon_Trotsky" },
+                    { text: "Joseph Stalin", url: "https://en.wikipedia.org/wiki/Joseph_Stalin" },
+                    { text: "Communist Manifesto", url: "https://en.wikipedia.org/wiki/The_Communist_Manifesto" },
+                    { text: "Friedrich Engels", url: "https://en.wikipedia.org/wiki/Friedrich_Engels" }
+                ],
+                period: 4
+            },
+            {
+                question: "What year did Abraham Lincoln issue the Emancipation Proclamation?",
+                options: ["1861", "1863", "1865", "1867"],
+                correct: 1,
+                explanation: "Abraham Lincoln issued the Emancipation Proclamation on January 1, 1863, declaring all slaves in Confederate-held territory to be free. This was a crucial step toward ending slavery in America.",
+                links: [
+                    { text: "Abraham Lincoln", url: "https://en.wikipedia.org/wiki/Abraham_Lincoln" },
+                    { text: "Emancipation Proclamation", url: "https://en.wikipedia.org/wiki/Emancipation_Proclamation" },
+                    { text: "American Civil War", url: "https://en.wikipedia.org/wiki/American_Civil_War" },
+                    { text: "Slavery in US", url: "https://en.wikipedia.org/wiki/Slavery_in_the_United_States" }
+                ],
+                period: 4
+            },
+
+            // World Wars Era (1900 - 1945)
+            {
+                question: "What year did the Titanic sink?",
+                options: ["1910", "1911", "1912", "1913"],
+                correct: 2,
+                explanation: "The RMS Titanic sank on April 15, 1912, after hitting an iceberg during its maiden voyage from Southampton to New York City. More than 1,500 people lost their lives in this tragedy.",
+                links: [
+                    { text: "RMS Titanic", url: "https://en.wikipedia.org/wiki/Titanic" },
+                    { text: "Sinking of Titanic", url: "https://en.wikipedia.org/wiki/Sinking_of_the_Titanic" },
+                    { text: "Maritime Disasters", url: "https://en.wikipedia.org/wiki/List_of_maritime_disasters" },
+                    { text: "White Star Line", url: "https://en.wikipedia.org/wiki/White_Star_Line" }
+                ],
+                period: 5
+            },
+            {
+                question: "In which year did World War I begin?",
+                options: ["1912", "1914", "1916", "1918"],
+                correct: 1,
+                explanation: "World War I began in 1914, triggered by the assassination of Archduke Franz Ferdinand. The war lasted until 1918 and resulted in over 17 million deaths.",
+                links: [
+                    { text: "World War I", url: "https://en.wikipedia.org/wiki/World_War_I" },
+                    { text: "Franz Ferdinand", url: "https://en.wikipedia.org/wiki/Archduke_Franz_Ferdinand" },
+                    { text: "Treaty of Versailles", url: "https://en.wikipedia.org/wiki/Treaty_of_Versailles" },
+                    { text: "Causes of WWI", url: "https://en.wikipedia.org/wiki/Causes_of_World_War_I" }
+                ],
+                period: 5
+            },
+            {
+                question: "In which year did World War II end?",
+                options: ["1944", "1945", "1946", "1943"],
+                correct: 1,
+                explanation: "World War II ended in 1945 with Germany's surrender in May and Japan's surrender in August after the atomic bombings of Hiroshima and Nagasaki. The war resulted in an estimated 70-85 million fatalities.",
+                links: [
+                    { text: "World War II", url: "https://en.wikipedia.org/wiki/World_War_II" },
+                    { text: "Victory in Europe", url: "https://en.wikipedia.org/wiki/Victory_in_Europe_Day" },
+                    { text: "Atomic Bombings", url: "https://en.wikipedia.org/wiki/Atomic_bombings_of_Hiroshima_and_Nagasaki" },
+                    { text: "End of WWII", url: "https://en.wikipedia.org/wiki/End_of_World_War_II_in_Europe" },
+                    { text: "VJ Day", url: "https://en.wikipedia.org/wiki/Victory_over_Japan_Day" }
+                ],
+                period: 5
+            },
+            {
+                question: "What treaty officially ended World War I?",
+                options: ["Treaty of Paris", "Treaty of Versailles", "Treaty of Ghent", "Treaty of Vienna"],
+                correct: 1,
+                explanation: "The Treaty of Versailles, signed in 1919, officially ended World War I. Its harsh terms imposed on Germany are often cited as contributing factors to World War II.",
+                links: [
+                    { text: "Treaty of Paris", url: "https://en.wikipedia.org/wiki/Treaty_of_Paris" },
+                    { text: "Treaty of Versailles", url: "https://en.wikipedia.org/wiki/Treaty_of_Versailles" },
+                    { text: "Treaty of Ghent", url: "https://en.wikipedia.org/wiki/Treaty_of_Ghent" },
+                    { text: "Congress of Vienna", url: "https://en.wikipedia.org/wiki/Congress_of_Vienna" },
+                    { text: "End of WWI", url: "https://en.wikipedia.org/wiki/Armistice_of_11_November_1918" }
+                ],
+                period: 5
+            },
+            {
+                question: "What was the name of the D-Day invasion during World War II?",
+                options: ["Operation Barbarossa", "Operation Overlord", "Operation Market Garden", "Operation Torch"],
+                correct: 1,
+                explanation: "Operation Overlord was the codename for the D-Day invasion on June 6, 1944, when Allied forces landed on the beaches of Normandy, France, marking a turning point in WWII.",
+                links: [
+                    { text: "Operation Barbarossa", url: "https://en.wikipedia.org/wiki/Operation_Barbarossa" },
+                    { text: "Operation Overlord", url: "https://en.wikipedia.org/wiki/Operation_Overlord" },
+                    { text: "Operation Market Garden", url: "https://en.wikipedia.org/wiki/Operation_Market_Garden" },
+                    { text: "Operation Torch", url: "https://en.wikipedia.org/wiki/Operation_Torch" },
+                    { text: "D-Day", url: "https://en.wikipedia.org/wiki/Normandy_landings" }
+                ],
+                period: 5
+            },
+            {
+                question: "Which country experienced a communist revolution in 1917?",
+                options: ["China", "Russia", "Cuba", "Vietnam"],
+                correct: 1,
+                explanation: "Russia experienced the Bolshevik Revolution in 1917, led by Vladimir Lenin, which overthrew the Tsarist autocracy and eventually led to the formation of the Soviet Union.",
+                links: [
+                    { text: "China", url: "https://en.wikipedia.org/wiki/Chinese_Communist_Revolution" },
+                    { text: "Russia", url: "https://en.wikipedia.org/wiki/Russia" },
+                    { text: "Cuba", url: "https://en.wikipedia.org/wiki/Cuban_Revolution" },
+                    { text: "Vietnam", url: "https://en.wikipedia.org/wiki/North_Vietnam" },
+                    { text: "Russian Revolution", url: "https://en.wikipedia.org/wiki/Russian_Revolution" },
+                    { text: "Vladimir Lenin", url: "https://en.wikipedia.org/wiki/Vladimir_Lenin" }
+                ],
+                period: 5
+            },
+            {
+                question: "What global economic crisis began in 1929?",
+                options: ["The Panic of 1907", "The Great Depression", "The Oil Crisis", "The Recession of 1937"],
+                correct: 1,
+                explanation: "The Great Depression began with the stock market crash in October 1929 and lasted throughout the 1930s, causing widespread unemployment and economic hardship worldwide.",
+                links: [
+                    { text: "Panic of 1907", url: "https://en.wikipedia.org/wiki/Panic_of_1907" },
+                    { text: "Great Depression", url: "https://en.wikipedia.org/wiki/Great_Depression" },
+                    { text: "1970s Oil Crisis", url: "https://en.wikipedia.org/wiki/1973_oil_crisis" },
+                    { text: "Recession of 1937", url: "https://en.wikipedia.org/wiki/Recession_of_1937%E2%80%931938" },
+                    { text: "Wall Street Crash", url: "https://en.wikipedia.org/wiki/Wall_Street_Crash_of_1929" }
+                ],
+                period: 5
+            },
+            {
+                question: "Who was the British Prime Minister during most of World War II?",
+                options: ["Neville Chamberlain", "Winston Churchill", "Clement Attlee", "Anthony Eden"],
+                correct: 1,
+                explanation: "Winston Churchill served as British Prime Minister from 1940-1945 during most of World War II, providing inspirational leadership during Britain's darkest hour.",
+                links: [
+                    { text: "Neville Chamberlain", url: "https://en.wikipedia.org/wiki/Neville_Chamberlain" },
+                    { text: "Winston Churchill", url: "https://en.wikipedia.org/wiki/Winston_Churchill" },
+                    { text: "Clement Attlee", url: "https://en.wikipedia.org/wiki/Clement_Attlee" },
+                    { text: "Anthony Eden", url: "https://en.wikipedia.org/wiki/Anthony_Eden" },
+                    { text: "Britain in WWII", url: "https://en.wikipedia.org/wiki/Military_history_of_the_United_Kingdom_during_World_War_II" }
+                ],
+                period: 5
+            },
+
+            // Modern Era (1945 - 2000)
+            {
+                question: "What year did the Berlin Wall fall?",
+                options: ["1987", "1989", "1991", "1985"],
+                correct: 1,
+                explanation: "The Berlin Wall fell on November 9, 1989, symbolizing the end of the Cold War and the beginning of German reunification. This momentous event reshaped Europe's political landscape.",
+                links: [
+                    { text: "Berlin Wall", url: "https://en.wikipedia.org/wiki/Berlin_Wall" },
+                    { text: "Fall of the Wall", url: "https://en.wikipedia.org/wiki/Fall_of_the_Berlin_Wall" },
+                    { text: "Cold War", url: "https://en.wikipedia.org/wiki/Cold_War" },
+                    { text: "German Reunification", url: "https://en.wikipedia.org/wiki/German_reunification" }
+                ],
+                period: 6
+            },
+            {
+                question: "Who was the first person to walk on the moon?",
+                options: ["Buzz Aldrin", "Yuri Gagarin", "Neil Armstrong", "John Glenn"],
+                correct: 2,
+                explanation: "Neil Armstrong became the first human to walk on the moon on July 20, 1969, during NASA's Apollo 11 mission. His famous words were: 'That's one small step for man, one giant leap for mankind.'",
+                links: [
+                    { text: "Buzz Aldrin", url: "https://en.wikipedia.org/wiki/Buzz_Aldrin" },
+                    { text: "Yuri Gagarin", url: "https://en.wikipedia.org/wiki/Yuri_Gagarin" },
+                    { text: "Neil Armstrong", url: "https://en.wikipedia.org/wiki/Neil_Armstrong" },
+                    { text: "John Glenn", url: "https://en.wikipedia.org/wiki/John_Glenn" },
+                    { text: "Apollo 11", url: "https://en.wikipedia.org/wiki/Apollo_11" },
+                    { text: "Moon Landing", url: "https://en.wikipedia.org/wiki/Moon_landing" },
+                    { text: "Space Race", url: "https://en.wikipedia.org/wiki/Space_Race" }
+                ],
+                period: 6
+            },
+            {
+                question: "Which country gifted the Statue of Liberty to the United States?",
+                options: ["England", "Spain", "France", "Italy"],
+                correct: 2,
+                explanation: "France gifted the Statue of Liberty to the United States in 1886 as a symbol of friendship and to commemorate the centennial of American independence. It was designed by Frédéric Auguste Bartholdi.",
+                links: [
+                    { text: "England", url: "https://en.wikipedia.org/wiki/England" },
+                    { text: "Spain", url: "https://en.wikipedia.org/wiki/Spain" },
+                    { text: "France", url: "https://en.wikipedia.org/wiki/France" },
+                    { text: "Italy", url: "https://en.wikipedia.org/wiki/Italy" },
+                    { text: "Statue of Liberty", url: "https://en.wikipedia.org/wiki/Statue_of_Liberty" },
+                    { text: "Frédéric Bartholdi", url: "https://en.wikipedia.org/wiki/Fr%C3%A9d%C3%A9ric_Auguste_Bartholdi" },
+                    { text: "Franco-American Relations", url: "https://en.wikipedia.org/wiki/France%E2%80%93United_States_relations" }
+                ],
+                period: 6
+            },
+            {
+                question: "In what year did the Soviet Union dissolve?",
+                options: ["1989", "1990", "1991", "1992"],
+                correct: 2,
+                explanation: "The Soviet Union officially dissolved on December 26, 1991, marking the end of the Cold War era. This led to the creation of 15 independent republics and dramatically reshaped global politics.",
+                links: [
+                    { text: "Soviet Union", url: "https://en.wikipedia.org/wiki/Soviet_Union" },
+                    { text: "Dissolution of USSR", url: "https://en.wikipedia.org/wiki/Dissolution_of_the_Soviet_Union" },
+                    { text: "Mikhail Gorbachev", url: "https://en.wikipedia.org/wiki/Mikhail_Gorbachev" },
+                    { text: "Post-Soviet States", url: "https://en.wikipedia.org/wiki/Post-Soviet_states" },
+                    { text: "Cold War End", url: "https://en.wikipedia.org/wiki/Cold_War_(1985%E2%80%931991)" }
+                ],
+                period: 6
+            },
+            {
+                question: "What major civil rights leader delivered the 'I Have a Dream' speech in 1963?",
+                options: ["Malcolm X", "Martin Luther King Jr.", "Rosa Parks", "Jesse Jackson"],
+                correct: 1,
+                explanation: "Martin Luther King Jr. delivered his famous 'I Have a Dream' speech on August 28, 1963, during the March on Washington. It became a defining moment of the American Civil Rights Movement.",
+                links: [
+                    { text: "Malcolm X", url: "https://en.wikipedia.org/wiki/Malcolm_X" },
+                    { text: "Martin Luther King Jr.", url: "https://en.wikipedia.org/wiki/Martin_Luther_King_Jr." },
+                    { text: "Rosa Parks", url: "https://en.wikipedia.org/wiki/Rosa_Parks" },
+                    { text: "Jesse Jackson", url: "https://en.wikipedia.org/wiki/Jesse_Jackson" },
+                    { text: "I Have a Dream", url: "https://en.wikipedia.org/wiki/I_Have_a_Dream" },
+                    { text: "Civil Rights Movement", url: "https://en.wikipedia.org/wiki/Civil_rights_movement" }
+                ],
+                period: 6
+            },
+            {
+                question: "What war was fought between North and South Vietnam from 1955 to 1975?",
+                options: ["Korean War", "Vietnam War", "Gulf War", "Cold War"],
+                correct: 1,
+                explanation: "The Vietnam War (1955-1975) was fought between North Vietnam (supported by the Soviet Union and China) and South Vietnam (supported by the United States). It ended with North Vietnam's victory.",
+                links: [
+                    { text: "Korean War", url: "https://en.wikipedia.org/wiki/Korean_War" },
+                    { text: "Vietnam War", url: "https://en.wikipedia.org/wiki/Vietnam_War" },
+                    { text: "Gulf War", url: "https://en.wikipedia.org/wiki/Gulf_War" },
+                    { text: "Cold War", url: "https://en.wikipedia.org/wiki/Cold_War" },
+                    { text: "Fall of Saigon", url: "https://en.wikipedia.org/wiki/Fall_of_Saigon" }
+                ],
+                period: 6
+            },
+            {
+                question: "Who was the first African American President of the United States?",
+                options: ["Colin Powell", "Jesse Jackson", "Barack Obama", "Thurgood Marshall"],
+                correct: 2,
+                explanation: "Barack Obama became the first African American President of the United States, serving from 2009 to 2017. His election was a historic milestone in American history.",
+                links: [
+                    { text: "Colin Powell", url: "https://en.wikipedia.org/wiki/Colin_Powell" },
+                    { text: "Jesse Jackson", url: "https://en.wikipedia.org/wiki/Jesse_Jackson" },
+                    { text: "Barack Obama", url: "https://en.wikipedia.org/wiki/Barack_Obama" },
+                    { text: "Thurgood Marshall", url: "https://en.wikipedia.org/wiki/Thurgood_Marshall" },
+                    { text: "2008 Election", url: "https://en.wikipedia.org/wiki/2008_United_States_presidential_election" }
+                ],
+                period: 6
+            },
+            {
+                question: "What nuclear disaster occurred in Ukraine in 1986?",
+                options: ["Three Mile Island", "Fukushima", "Chernobyl", "Kyshtym"],
+                correct: 2,
+                explanation: "The Chernobyl disaster occurred on April 26, 1986, when a reactor at the Chernobyl Nuclear Power Plant exploded, releasing massive amounts of radiation. It's considered the worst nuclear disaster in history.",
+                links: [
+                    { text: "Three Mile Island", url: "https://en.wikipedia.org/wiki/Three_Mile_Island_accident" },
+                    { text: "Fukushima", url: "https://en.wikipedia.org/wiki/Fukushima_nuclear_disaster" },
+                    { text: "Chernobyl", url: "https://en.wikipedia.org/wiki/Chernobyl_disaster" },
+                    { text: "Kyshtym", url: "https://en.wikipedia.org/wiki/Kyshtym_disaster" },
+                    { text: "Nuclear Accidents", url: "https://en.wikipedia.org/wiki/Nuclear_and_radiation_accidents_and_incidents" }
+                ],
+                period: 6
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedAnswer = null;
+        let userAnswers = [];
+        let selectedPeriod = 6;
+        let filteredQuestions = [];
+
+        const startScreen = document.getElementById('startScreen');
+        const quizArea = document.getElementById('quizArea');
+        const resultsScreen = document.getElementById('resultsScreen');
+        const startBtn = document.getElementById('startBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const timelineSlider = document.getElementById('timelineSlider');
+        const periodDisplay = document.getElementById('periodDisplay');
+        const headerResetBtn = document.getElementById('headerResetBtn');
+
+        // Timeline slider functionality
+        timelineSlider.addEventListener('input', function() {
+            selectedPeriod = parseInt(this.value);
+            updatePeriodDisplay();
+        });
+
+        // Header reset button functionality
+        headerResetBtn.addEventListener('click', resetToStart);
+
+        function updatePeriodDisplay() {
+            const period = timePeriods[selectedPeriod];
+            const questionsCount = quizQuestions.filter(q => q.period === selectedPeriod).length;
+            
+            periodDisplay.innerHTML = `
+                <div class="period-name">${period.name}</div>
+                <div class="period-years">${period.years}</div>
+                <div class="period-description">${period.description}</div>
+                <div style="margin-top: 15px; font-family: 'Courier Prime', monospace; font-size: 0.9rem; color: var(--red); font-weight: 700;">
+                    ${questionsCount} questions available for this era
+                </div>
+            `;
+        }
+
+        startBtn.addEventListener('click', startQuiz);
+        nextBtn.addEventListener('click', nextQuestion);
+        restartBtn.addEventListener('click', restartQuiz);
+
+        function startQuiz() {
+            // Filter questions based on selected period
+            filteredQuestions = quizQuestions.filter(q => q.period === selectedPeriod);
+            
+            if (filteredQuestions.length === 0) {
+                alert('No questions available for this period. Please select a different era.');
+                return;
+            }
+            
+            // Shuffle the questions
+            filteredQuestions = filteredQuestions.sort(() => Math.random() - 0.5);
+            
+            // Reset quiz state
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = [];
+            
+            // Hide start screen and show quiz
+            startScreen.style.display = 'none';
+            quizArea.style.display = 'block';
+            quizArea.classList.add('active');
+            
+            // Small delay to ensure DOM is ready
+            setTimeout(() => {
+                showQuestion();
+            }, 10);
+        }
+
+        function showQuestion() {
+            selectedAnswer = null;
+            const question = filteredQuestions[currentQuestion];
+            
+            document.getElementById('questionNumber').textContent = `Question ${currentQuestion + 1} of ${filteredQuestions.length}`;
+            document.getElementById('questionText').textContent = question.question;
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'none';
+            
+            const progressPercent = ((currentQuestion + 1) / filteredQuestions.length) * 100;
+            document.getElementById('progressBar').style.width = progressPercent + '%';
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.textContent = option;
+                optionDiv.addEventListener('click', () => selectAnswer(index));
+                optionsContainer.appendChild(optionDiv);
+            });
+        }
+
+        function selectAnswer(index) {
+            if (selectedAnswer !== null) return;
+            
+            selectedAnswer = index;
+            const question = filteredQuestions[currentQuestion];
+            const options = document.querySelectorAll('.option');
+            
+            userAnswers.push({
+                question: question.question,
+                userAnswer: question.options[index],
+                correctAnswer: question.options[question.correct],
+                isCorrect: index === question.correct
+            });
+            
+            options.forEach((option, i) => {
+                if (i === question.correct) {
+                    option.classList.add('correct');
+                } else if (i === index) {
+                    option.classList.add('incorrect');
+                }
+                option.style.pointerEvents = 'none';
+            });
+            
+            if (index === question.correct) {
+                score++;
+            }
+            
+            const feedback = document.getElementById('feedback');
+            feedback.innerHTML = `
+                <div>${question.explanation}</div>
+                <div class="reading-links">
+                    <div class="reading-links-title">📚 Read More About:</div>
+                    <div class="link-tags">
+                        ${question.links.map(link => 
+                            `<a href="${link.url}" class="link-tag" target="_blank" rel="noopener noreferrer">${link.text}</a>`
+                        ).join('')}
+                    </div>
+                </div>
+            `;
+            feedback.style.display = 'block';
+            
+            document.getElementById('nextBtn').style.display = 'inline-block';
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            
+            if (currentQuestion < filteredQuestions.length) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizArea.style.display = 'none';
+            resultsScreen.classList.add('active');
+            
+            const percentage = Math.round((score / filteredQuestions.length) * 100);
+            document.getElementById('scoreDisplay').textContent = `${score}/${filteredQuestions.length}`;
+            
+            let message = '';
+            if (percentage === 100) {
+                message = 'Perfect Score! You are a true history scholar!';
+            } else if (percentage >= 80) {
+                message = 'Outstanding! You have excellent knowledge of history!';
+            } else if (percentage >= 60) {
+                message = 'Well done! You know your history quite well!';
+            } else if (percentage >= 40) {
+                message = 'Not bad! Keep learning and you\'ll master history!';
+            } else {
+                message = 'Every expert was once a beginner. Keep exploring history!';
+            }
+            document.getElementById('scoreMessage').textContent = message;
+            
+            const reviewSection = document.getElementById('reviewSection');
+            reviewSection.innerHTML = '<h3 style="font-family: \'Playfair Display\', serif; font-size: 2rem; margin-bottom: 20px;">Review Your Answers</h3>';
+            
+            userAnswers.forEach((answer, index) => {
+                const reviewItem = document.createElement('div');
+                reviewItem.className = `review-item ${answer.isCorrect ? 'correct-answer' : 'wrong-answer'}`;
+                reviewItem.innerHTML = `
+                    <div class="review-question"><strong>Q${index + 1}:</strong> ${answer.question}</div>
+                    <div class="review-answer">
+                        Your answer: ${answer.userAnswer} ${answer.isCorrect ? '✓' : '✗'}
+                        ${!answer.isCorrect ? `<br>Correct answer: ${answer.correctAnswer}` : ''}
+                    </div>
+                `;
+                reviewSection.appendChild(reviewItem);
+            });
+        }
+
+        function restartQuiz() {
+            resetToStart();
+        }
+
+        function resetToStart() {
+            resultsScreen.classList.remove('active');
+            resultsScreen.style.display = 'none';
+            startScreen.style.display = 'block';
+            quizArea.style.display = 'none';
+            quizArea.classList.remove('active');
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = [];
+            filteredQuestions = [];
+            
+            // Refresh period display
+            updatePeriodDisplay();
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Initialize period display
+        updatePeriodDisplay();
+        }); // End DOMContentLoaded
+    </script>
+
+</body>
+</html>
